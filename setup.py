@@ -12,13 +12,13 @@ setup(name='scraps',
       zip_safe=False,
       install_requires=[
           'marshmallow-dataclass[enum,union]',
-          'pydantic'
+          'dataclasses-json'
       ],
       entry_points={
           'console_scripts': [
               'mm=mm:main',
               'executable=executable:main',
-              'pd=pd:main'
+              'dtj=dtj:main'
           ],
           'gui_scripts': [
               'unicodenames=unicodenames:main'

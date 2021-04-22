@@ -1,8 +1,8 @@
-from pydantic.dataclasses import dataclass
-from dataclasses import field
+from dataclasses import dataclass
 from datetime import date
-from typing import Any
 from typing import List
+
+from dataclasses_json import DataClassJsonMixin
 
 RAW = '''{
     "foo": "bar",
@@ -22,17 +22,20 @@ RAW = '''{
 
 
 @dataclass
-class BazElement:
+class BazElement(DataClassJsonMixin):
     qux: int
     quux: date
 
 
 @dataclass
-class C:
+class C(DataClassJsonMixin):
     foo: str
     baz: List[BazElement]
     pippo: bool
 
 
 def main() -> None:
-    ...
+    obj = C.from_json(RAW)
+    print(obj)
+    raw = obj.to_json()
+    print(raw)

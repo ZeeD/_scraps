@@ -1,7 +1,5 @@
 from dataclasses import dataclass
-from dataclasses import field
 from datetime import date
-from typing import Any
 from typing import List
 
 from marshmallow_dataclass import class_schema
