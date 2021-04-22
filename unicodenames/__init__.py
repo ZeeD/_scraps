@@ -1,4 +1,5 @@
 from __future__ import annotations
+
 from functools import partial
 from tkinter import Event
 from tkinter import Label
