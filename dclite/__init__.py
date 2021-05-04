@@ -1,7 +1,11 @@
-from dataclasses import dataclass, is_dataclass, fields
+from dataclasses import dataclass
+from dataclasses import fields
+from dataclasses import is_dataclass
 from datetime import datetime
 from sqlite3 import connect
-from typing import TypeVar, Any, Iterator
+from typing import Any
+from typing import Iterator
+from typing import TypeVar
 
 T = TypeVar('T')
 
