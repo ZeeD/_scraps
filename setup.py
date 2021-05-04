@@ -1,7 +1,7 @@
 from setuptools import find_packages
 from setuptools import setup
 
-setup(name='scraps',
+setup(name='zedscraps',
       version='0.1',
       description='_scraps',
       url='',
@@ -12,7 +12,10 @@ setup(name='scraps',
       zip_safe=False,
       install_requires=[
           'marshmallow-dataclass[enum,union]',
-          'dataclasses-json'
+          'dataclasses-json',
+          'vosk',
+          'sounddevice',
+          'pyaudio'
       ],
       entry_points={
           'console_scripts': [
