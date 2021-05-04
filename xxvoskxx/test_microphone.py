@@ -17,7 +17,7 @@ class TestMicrophone:
         self.q = Queue[bytes]()
 
     def speech_to_text(self) -> None:
-        samplerate = int(query_devices(kind='input')['default_samplerate'])
+        samplerate = int(query_devices(kind='input')['default_samplerate']) # 44100
 
         with RawInputStream(samplerate=samplerate,
                             blocksize=8000,
@@ -38,4 +38,4 @@ class TestMicrophone:
                  status: CallbackFlags) -> None:
         if status:
             print(status, file=stderr)
-        self.q.put(bytes(indata))
+        self.q.put(bytes(indata)) # len(bytes(indata)) == 16000
