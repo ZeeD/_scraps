@@ -1,0 +1,6 @@
+class buffer:
+    def __bytes__(self) -> bytes: ...
+
+
+class _CDataBase:
+    ...

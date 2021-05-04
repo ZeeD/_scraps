@@ -1,2 +1,5 @@
+from .test_microphone import TestMicrophone
+
+
 def main() -> None:
-    from . import test_microphone
+    TestMicrophone().speech_to_text()
