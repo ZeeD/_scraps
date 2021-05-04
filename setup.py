@@ -15,7 +15,8 @@ setup(name='zedscraps',
           'dataclasses-json',
           'vosk',
           'sounddevice',
-          'pyaudio'
+          'pyaudio',
+          'quart-trio'
       ],
       entry_points={
           'console_scripts': [

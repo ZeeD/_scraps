@@ -28,8 +28,10 @@ class TestMicrophone:
                                   samplerate)
 
             while True:
-                if rec.AcceptWaveform(self.q.get()):
-                    print(loads(rec.Result()))
+                data = self.q.get()
+                print(data)
+                if rec.AcceptWaveform(data):
+                    print(loads(rec.FinalResult()))
 
     def callback(self,
                  indata: buffer,
