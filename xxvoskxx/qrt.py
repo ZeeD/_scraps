@@ -1,9 +1,15 @@
-from quart import websocket
-from quart_trio import QuartTrio
+from json import dumps
 from json import loads
 from os.path import join
+
+from quart import websocket
+from quart_trio import QuartTrio
 from vosk import KaldiRecognizer
 from vosk import Model
+
+
+letters = 'a', 'bi', 'ci', 'di', 'e', 'effe', 'gi', 'acca'
+numbers = 'uno', 'due', 'tre', 'quattro', 'cinque', 'sei', 'sette', 'otto'
 
 
 class Qrt(QuartTrio):
@@ -15,10 +21,13 @@ class Qrt(QuartTrio):
             await websocket.accept()
 
             rec = KaldiRecognizer(Model(join(__file__, '..', 'model')),
-                                  int(samplerate))
+                                  int(samplerate),
+                                  dumps([f'{letter} {number}'
+                                         for letter in letters
+                                         for number in numbers]))
 
             while True:
                 data = await websocket.receive()
 
                 if rec.AcceptWaveform(data):
-                    await websocket.send_json(loads(rec.FinalResult()))
+                    await websocket.send_json(loads(rec.Result()))
