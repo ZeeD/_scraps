@@ -3,12 +3,34 @@ from dataclasses import fields
 from dataclasses import is_dataclass
 from datetime import datetime
 from sqlite3 import connect
-from typing import Any
+from sqlite3.dbapi2 import Connection
+from typing import Any, Generic, Protocol, Optional
 from typing import Iterator
 from typing import TypeVar
 from sys import stderr
 
+
 T = TypeVar('T')
+
+
+class _Where(Generic[T]):
+    def __init__(self, con: Connection, dc: T):
+        self.con = con
+        self.dc = dc
+
+    def where(self, **kwargs: Any) -> None:
+        assert is_dataclass(self.dc)
+        names = [field.name for field in fields(self.dc)]
+        assert all(k in names for k in kwargs)
+
+        sql = f'UPDATE {self.dc.__class__.__name__} SET {", ".join(f"{name}=?" for name in names)} WHERE {" and ".join(f"{k}=?" for k in kwargs)}'
+        values = tuple(getattr(self.dc, name)
+                       for name in names) + tuple(kwargs.values())
+        print(sql, values, file=stderr)
+
+        cur = self.con.cursor()
+        cur.execute(sql, values)
+        self.con.commit()
 
 
 class dclite:
@@ -51,17 +73,8 @@ class dclite:
         for row in cur.fetchall():
             yield cls(**{n: v for n, v in zip(names, row)})  # type: ignore
 
-    def update(self, dc: T, **kwargs: Any) -> None:
-        assert is_dataclass(dc)
-        names = [field.name for field in fields(dc)]
-        assert all(k in names for k in kwargs)
-
-        sql = f'UPDATE {dc.__class__.__name__} SET {", ".join(f"{name}=?" for name in names)} WHERE {" and ".join(f"{k}=?" for k in kwargs)}'
-        values = tuple(getattr(dc, name) for name in names) + tuple(kwargs.values())
-        print(sql, values, file=stderr)
-
-        cur = self.con.cursor()
-        cur.execute(sql, values)
+    def set(self, dc: T) -> _Where[T]:
+        return _Where(self.con, dc)
 
     def delete(self, cls: type[T], **where: Any) -> None:
         assert is_dataclass(cls)
@@ -74,6 +87,7 @@ class dclite:
 
         cur = self.con.cursor()
         cur.execute(sql, values)
+        self.con.commit()
 
     def drop_table(self, cls: type[T]) -> None:
         assert is_dataclass(cls)
@@ -83,7 +97,6 @@ class dclite:
 
         self.con.cursor().execute(sql)
         self.con.commit()
-
 
 
 def main() -> None:
@@ -96,8 +109,7 @@ def main() -> None:
     db = dclite(':memory:')
     db.create_table(Foo)
     db.insert(Foo(bar=123, baz='str', qux=datetime(1982, 11, 5)))
-    db.update(Foo(bar=456, baz='str', qux=datetime(1982, 11, 5)),
-              bar=123)
+    db.set(Foo(bar=456, baz='str', qux=datetime(1982, 11, 5))).where(bar=123)
     for row in db.select(Foo, bar=456):
         print(row)
         assert isinstance(row, Foo)
