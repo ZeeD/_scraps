@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from datetime import date
 from typing import List
 
-from dataclasses_json import DataClassJsonMixin
+from dataclasses_json import DataClassJsonMixin  # type: ignore
 
 RAW = '''{
     "foo": "bar",
@@ -22,13 +22,13 @@ RAW = '''{
 
 
 @dataclass
-class BazElement(DataClassJsonMixin):
+class BazElement(DataClassJsonMixin):  # type: ignore
     qux: int
     quux: date
 
 
 @dataclass
-class C(DataClassJsonMixin):
+class C(DataClassJsonMixin):  # type: ignore
     foo: str
     baz: List[BazElement]
     pippo: bool
