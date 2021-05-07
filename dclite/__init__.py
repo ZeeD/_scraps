@@ -6,6 +6,7 @@ from sqlite3 import connect
 from typing import Any
 from typing import Iterator
 from typing import TypeVar
+from sys import stderr
 
 T = TypeVar('T')
 
@@ -19,7 +20,7 @@ class dclite:
         names = [field.name for field in fields(cls)]
 
         sql = f'CREATE TABLE {cls.__name__}({", ".join(names)})'
-        print(sql)
+        print(sql, file=stderr)
 
         self.con.cursor().execute(sql)
         self.con.commit()
@@ -28,9 +29,9 @@ class dclite:
         assert is_dataclass(dc)
         names = [field.name for field in fields(dc)]
 
-        sql = f'INSERT INTO {dc.__class__.__name__}({", ".join(names)}) values ({", ".join("?" for _ in names)})'
+        sql = f'INSERT INTO {dc.__class__.__name__}({", ".join(names)}) VALUES ({", ".join("?" for _ in names)})'
         values = tuple(getattr(dc, name) for name in names)
-        print(sql, values)
+        print(sql, values, file=stderr)
 
         self.con.cursor().execute(sql, values)
         self.con.commit()
@@ -40,15 +41,49 @@ class dclite:
         names = [field.name for field in fields(cls)]
         assert all(k in names for k in where)
 
-        sql = f'SELECT {", ".join(names)} from {cls.__name__} where {" and ".join(f"{k}=?" for k in where)}'
+        sql = f'SELECT {", ".join(names)} FROM {cls.__name__} WHERE {" and ".join(f"{k}=?" for k in where)}'
         values = tuple(where.values())
-        print(sql, values)
+        print(sql, values, file=stderr)
 
         cur = self.con.cursor()
         cur.execute(sql, values)
 
         for row in cur.fetchall():
             yield cls(**{n: v for n, v in zip(names, row)})  # type: ignore
+
+    def update(self, dc: T, **kwargs: Any) -> None:
+        assert is_dataclass(dc)
+        names = [field.name for field in fields(dc)]
+        assert all(k in names for k in kwargs)
+
+        sql = f'UPDATE {dc.__class__.__name__} SET {", ".join(f"{name}=?" for name in names)} WHERE {" and ".join(f"{k}=?" for k in kwargs)}'
+        values = tuple(getattr(dc, name) for name in names) + tuple(kwargs.values())
+        print(sql, values, file=stderr)
+
+        cur = self.con.cursor()
+        cur.execute(sql, values)
+
+    def delete(self, cls: type[T], **where: Any) -> None:
+        assert is_dataclass(cls)
+        names = [field.name for field in fields(cls)]
+        assert all(k in names for k in where)
+
+        sql = f'DELETE FROM {cls.__name__} where {" and ".join(f"{k}=?" for k in where)}'
+        values = tuple(where.values())
+        print(sql, values, file=stderr)
+
+        cur = self.con.cursor()
+        cur.execute(sql, values)
+
+    def drop_table(self, cls: type[T]) -> None:
+        assert is_dataclass(cls)
+
+        sql = f'DROP TABLE {cls.__name__}'
+        print(sql, file=stderr)
+
+        self.con.cursor().execute(sql)
+        self.con.commit()
+
 
 
 def main() -> None:
@@ -61,9 +96,9 @@ def main() -> None:
     db = dclite(':memory:')
     db.create_table(Foo)
     db.insert(Foo(bar=123, baz='str', qux=datetime(1982, 11, 5)))
-    db.update(Foo(bar=123, baz='str', qux=datetime(1982, 11, 5)),
+    db.update(Foo(bar=456, baz='str', qux=datetime(1982, 11, 5)),
               bar=123)
-    for row in db.select(Foo, bar=123):
+    for row in db.select(Foo, bar=456):
         print(row)
         assert isinstance(row, Foo)
     db.delete(Foo, bar=123)
