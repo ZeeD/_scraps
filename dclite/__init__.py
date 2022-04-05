@@ -4,11 +4,13 @@ from dataclasses import is_dataclass
 from datetime import datetime
 from sqlite3 import connect
 from sqlite3.dbapi2 import Connection
-from typing import Any, Generic, Protocol, Optional
-from typing import Iterator
-from typing import TypeVar
 from sys import stderr
-
+from typing import Any
+from typing import Generic
+from typing import Iterator
+from typing import Optional
+from typing import Protocol
+from typing import TypeVar
 
 T = TypeVar('T')
 

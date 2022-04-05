@@ -7,7 +7,6 @@ from quart_trio import QuartTrio
 from vosk import KaldiRecognizer
 from vosk import Model
 
-
 letters = 'a', 'bi', 'ci', 'di', 'e', 'effe', 'gi', 'acca'
 numbers = 'uno', 'due', 'tre', 'quattro', 'cinque', 'sei', 'sette', 'otto'
 
