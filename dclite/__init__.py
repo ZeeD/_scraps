@@ -73,7 +73,7 @@ class dclite:
         cur.execute(sql, values)
 
         for row in cur.fetchall():
-            yield cls(**{n: v for n, v in zip(names, row)})  # type: ignore
+            yield cls(**{n: v for n, v in zip(names, row)})
 
     def set(self, dc: T) -> _Where[T]:
         return _Where(self.con, dc)
