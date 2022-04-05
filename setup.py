@@ -10,21 +10,17 @@ setup(name='zedscraps',
       license='GPL3',
       packages=find_packages(),
       zip_safe=False,
-      install_requires=[
-          'marshmallow-dataclass[enum,union]',
-          'dataclasses-json',
-          'vosk',
-          'sounddevice',
-          'pyaudio',
-          'quart-trio'
-      ],
-      entry_points={
-          'console_scripts': [
-              'mm=mm:main',
-              'executable=executable:main',
-              'dtj=dtj:main'
-          ],
-          'gui_scripts': [
-              'unicodenames=unicodenames:main'
-          ],
-      })
+      install_requires=['marshmallow-dataclass[enum,union]',
+                        'dataclasses-json',
+                        'vosk',
+                        'sounddevice',
+                        'quart-trio',
+                        'trio',
+                        'mypy',
+                        # 'pyaudio',
+                        'trio_typing'],
+      entry_points={'console_scripts': ['mm=mm:main',
+                                        'executable=executable:main',
+                                        'dtj=dtj:main',
+                                        'rubinetto=rubinetto.__main__:main'],
+                    'gui_scripts': ['unicodenames=unicodenames:main']})
